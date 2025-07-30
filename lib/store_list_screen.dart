@@ -26,8 +26,13 @@ class StoreListScreen extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.arrow_back, color: Colors.white),
-                    const SizedBox(width: 12),
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                    const SizedBox(width: 4),
                     const Text(
                       "Store list page",
                       style: TextStyle(
@@ -225,9 +230,7 @@ class StoreListScreen extends StatelessWidget {
               decoration: const BoxDecoration(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                 image: DecorationImage(
-                  image: AssetImage(
-                    'assets/shirt.png',
-                  ), // Add this asset in pubspec
+                  image: AssetImage('assets/shirt.png'),
                   fit: BoxFit.cover,
                 ),
               ),
