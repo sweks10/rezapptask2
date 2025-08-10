@@ -13,6 +13,11 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void addCoins(int coinsToAdd) {
+    coins += coinsToAdd;
+    notifyListeners();
+  }
+
   void setCoins(int newCoins) {
     coins = newCoins;
     notifyListeners();

@@ -1,8 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:rezapp/payment_screen.dart';
+import 'package:rezapp/providers/user_provider.dart';
 import 'package:rezapp/review_cashback_screen.dart';
 
-class ProductDetailScreen extends StatelessWidget {
-  const ProductDetailScreen({super.key});
+class ProductDetailScreen extends StatefulWidget {
+  final String title;
+  final String price;
+  final String image;
+
+  const ProductDetailScreen({
+    super.key,
+    required this.title,
+    required this.price,
+    required this.image,
+  });
+
+  @override
+  State<ProductDetailScreen> createState() => _ProductDetailScreenState();
+}
+
+class _ProductDetailScreenState extends State<ProductDetailScreen> {
+  bool reviewSubmitted = false;
+
+  int calculateCoins(String price) {
+    final numeric = price.replaceAll(RegExp(r'[^\d]'), '');
+    if (numeric.isEmpty) return 0;
+    final value = int.tryParse(numeric) ?? 0;
+    return (value * 0.10).round();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,15 +43,18 @@ class ProductDetailScreen extends StatelessWidget {
         ),
         actions: [
           Row(
-            children: const [
-              Icon(Icons.monetization_on, color: Colors.amber),
-              SizedBox(width: 4),
-              Text("352", style: TextStyle(color: Colors.black)),
-              SizedBox(width: 12),
-              Icon(Icons.share, color: Colors.black),
-              SizedBox(width: 12),
-              Icon(Icons.favorite_border, color: Colors.black),
-              SizedBox(width: 12),
+            children: [
+              const Icon(Icons.monetization_on, color: Colors.amber),
+              const SizedBox(width: 4),
+              Text(
+                reviewSubmitted ? "${calculateCoins(widget.price)}" : "0",
+                style: const TextStyle(color: Colors.black),
+              ),
+              const SizedBox(width: 12),
+              const Icon(Icons.share, color: Colors.black),
+              const SizedBox(width: 12),
+              const Icon(Icons.favorite_border, color: Colors.black),
+              const SizedBox(width: 12),
             ],
           ),
         ],
@@ -41,7 +70,7 @@ class ProductDetailScreen extends StatelessWidget {
                 Center(
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(16),
-                    child: Image.asset('assets/shirt.png', height: 250),
+                    child: Image.asset(widget.image, height: 250),
                   ),
                 ),
                 Positioned(
@@ -96,9 +125,9 @@ class ProductDetailScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "Little Big Comfort Tee",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          Text(
+            widget.title,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 6),
           const Text(
@@ -106,19 +135,22 @@ class ProductDetailScreen extends StatelessWidget {
             style: TextStyle(color: Colors.grey, fontSize: 14),
           ),
           const SizedBox(height: 14),
-          const Row(
+          Row(
             children: [
               Text(
-                "₹2,199",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                widget.price,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              SizedBox(width: 12),
-              Icon(Icons.location_on, size: 16, color: Colors.grey),
-              Text("0.7 Km, BTM", style: TextStyle(fontSize: 13)),
-              SizedBox(width: 10),
-              Icon(Icons.circle, size: 8, color: Colors.green),
-              SizedBox(width: 4),
-              Text("open", style: TextStyle(fontSize: 13)),
+              const SizedBox(width: 12),
+              const Icon(Icons.location_on, size: 16, color: Colors.grey),
+              const Text("0.7 Km, BTM", style: TextStyle(fontSize: 13)),
+              const SizedBox(width: 10),
+              const Icon(Icons.circle, size: 8, color: Colors.green),
+              const SizedBox(width: 4),
+              const Text("open", style: TextStyle(fontSize: 13)),
             ],
           ),
           const SizedBox(height: 12),
@@ -137,11 +169,21 @@ class ProductDetailScreen extends StatelessWidget {
                   final result = await Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ReviewCashbackScreen(),
+                      builder: (context) => ReviewCashbackScreen(
+                        image: widget.image,
+                        price: widget.price,
+                      ),
                     ),
                   );
-                  if (result == true) {
-                    print("Review submitted, refresh HomeScreen if needed");
+                  if (result is int && result > 0) {
+                    // Add coins to provider
+                    Provider.of<UserProvider>(
+                      context,
+                      listen: false,
+                    ).addCoins(result);
+                    setState(() {
+                      reviewSubmitted = true;
+                    });
                   }
                 },
                 child: const Text(
@@ -195,7 +237,14 @@ class ProductDetailScreen extends StatelessWidget {
         const SizedBox(width: 12),
         Expanded(
           child: OutlinedButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => MakePaymentScreen(price: widget.price),
+                ),
+              );
+            },
             style: OutlinedButton.styleFrom(
               side: const BorderSide(color: Color(0xFF7A32FF)),
               shape: RoundedRectangleBorder(
@@ -204,7 +253,7 @@ class ProductDetailScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
             child: const Text(
-              "Book Now",
+              "Buy Now",
               style: TextStyle(color: Color(0xFF7A32FF), fontSize: 14),
             ),
           ),

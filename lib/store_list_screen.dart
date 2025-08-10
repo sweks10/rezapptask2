@@ -1,15 +1,116 @@
 import 'package:flutter/material.dart';
 import 'package:rezapp/product_detail_screen.dart';
 
-class StoreListScreen extends StatelessWidget {
+class StoreListScreen extends StatefulWidget {
   const StoreListScreen({super.key});
 
   @override
+  State<StoreListScreen> createState() => _StoreListScreenState();
+}
+
+class _StoreListScreenState extends State<StoreListScreen> {
+  String searchQuery = "";
+
+  // Updated product list with new names and store info
+  List<Map<String, String>> allProducts = [
+    {
+      "title": "Little Big Comfort White Shirt",
+      "price": "₹2,199",
+      "image": "assets/whiteshirt1.png",
+      "store": "Reliance Trends",
+      "distance": "0.7 Km, BTM",
+      "isOpen": "Open",
+      "online": "Online available",
+      "rating": "4.2",
+    },
+    {
+      "title": "Slim White Shirt",
+      "price": "₹1,999",
+      "image": "assets/whiteshirt2.png",
+      "store": "Reliance Trends",
+      "distance": "0.7 Km, BTM",
+      "isOpen": "Open",
+      "online": "Online available",
+      "rating": "4.2",
+    },
+    {
+      "title": "Regular Fit White Shirt",
+      "price": "₹1,799",
+      "image": "assets/whiteshirt3.png",
+      "store": "Reliance Trends",
+      "distance": "0.7 Km, BTM",
+      "isOpen": "Open",
+      "online": "Online available",
+      "rating": "4.2",
+    },
+    {
+      "title": "Classic White Shirt",
+      "price": "₹2,399",
+      "image": "assets/whiteshirt4.png",
+      "store": "Reliance Trends",
+      "distance": "0.7 Km, BTM",
+      "isOpen": "Open",
+      "online": "Online available",
+      "rating": "4.2",
+    },
+    {
+      "title": "Purple Slim Shirt",
+      "price": "₹2,299",
+      "image": "assets/purple1.png",
+      "store": "Reliance Trends",
+      "distance": "0.7 Km, BTM",
+      "isOpen": "Open",
+      "online": "Online available",
+      "rating": "4.2",
+    },
+    {
+      "title": "Purple Regular Fit Shirt",
+      "price": "₹2,099",
+      "image": "assets/purple2.png",
+      "store": "Reliance Trends",
+      "distance": "0.7 Km, BTM",
+      "isOpen": "Open",
+      "online": "Online available",
+      "rating": "4.2",
+    },
+    {
+      "title": "Purple Classic Shirt",
+      "price": "₹1,899",
+      "image": "assets/purple3.png",
+      "store": "Reliance Trends",
+      "distance": "0.7 Km, BTM",
+      "isOpen": "Open",
+      "online": "Online available",
+      "rating": "4.2",
+    },
+    {
+      "title": "Purple Comfort Tee",
+      "price": "₹2,499",
+      "image": "assets/purple4.png",
+      "store": "Reliance Trends",
+      "distance": "0.7 Km, BTM",
+      "isOpen": "Open",
+      "online": "Online available",
+      "rating": "4.2",
+    },
+  ];
+
+  @override
   Widget build(BuildContext context) {
+    // Filter products based on search query
+    List<Map<String, String>> filteredProducts = allProducts
+        .where(
+          (product) => product["title"]!.toLowerCase().contains(
+            searchQuery.toLowerCase(),
+          ),
+        )
+        .toList();
+
     return Scaffold(
       backgroundColor: const Color(0xFFF7F6FB),
       body: Column(
         children: [
+          // Header with search bar
           Container(
             decoration: const BoxDecoration(
               color: Color(0xFF7A32FF),
@@ -45,8 +146,13 @@ class StoreListScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 TextField(
+                  onChanged: (value) {
+                    setState(() {
+                      searchQuery = value;
+                    });
+                  },
                   decoration: InputDecoration(
-                    hintText: 'Search for the service',
+                    hintText: 'Search for shirts',
                     prefixIcon: const Icon(Icons.search),
                     filled: true,
                     fillColor: Colors.white,
@@ -60,145 +166,60 @@ class StoreListScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
-                SizedBox(
-                  height: 40,
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    children: [
-                      _buildFilterChip("Fashion"),
-                      _buildFilterChip("Gender"),
-                      _buildFilterChip("Wasil pay"),
-                      _buildFilterChip("Online"),
-                    ],
-                  ),
-                ),
               ],
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "FreeShipping",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-            ),
-          ),
-          Expanded(
-            child: ListView(
+          // Store info section
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
               children: [
-                _buildStoreSection(
-                  context,
-                  storeName: "Reliance Trends",
-                  logoAsset: 'assets/reliancelogo.png',
-                  distance: "0.7 Km, BTM",
-                  isOpen: true,
-                  onlineAvailable: true,
-                  rating: 4.2,
-                  items: [
-                    {'title': 'Little Big Comfort Tee', 'price': '₹2,199'},
-                    {'title': 'Little Big Comfort Tee', 'price': '₹2,199'},
-                  ],
-                ),
-                _buildStoreSection(
-                  context,
-                  storeName: "Amazon",
-                  logoAsset: 'assets/amazon.png',
-                  distance: "",
-                  isOpen: false,
-                  onlineAvailable: true,
-                  rating: 4.2,
-                  items: [
-                    {'title': 'Little Big Comfort Tee', 'price': '₹2,199'},
-                    {'title': 'Little Big Comfort Tee', 'price': '₹2,199'},
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFilterChip(String label) {
-    return Container(
-      margin: const EdgeInsets.only(right: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey.shade300),
-      ),
-      child: Center(
-        child: Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
-      ),
-    );
-  }
-
-  Widget _buildStoreSection(
-    BuildContext context, {
-    required String storeName,
-    required String logoAsset,
-    required double rating,
-    required String distance,
-    required bool isOpen,
-    required bool onlineAvailable,
-    required List<Map<String, String>> items,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Image.asset(logoAsset, width: 30, height: 30),
-              const SizedBox(width: 8),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    storeName,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  Row(
-                    children: [
-                      const Icon(Icons.star, size: 14, color: Colors.orange),
-                      Text(rating.toString()),
-                      if (distance.isNotEmpty) ...[
+                Image.asset('assets/reliancelogo.png', width: 30, height: 30),
+                const SizedBox(width: 8),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Reliance Trends",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Row(
+                      children: [
+                        const Icon(Icons.star, size: 14, color: Colors.orange),
+                        const Text("4.2"),
                         const SizedBox(width: 6),
-                        Text(distance),
-                      ],
-                      if (isOpen) ...[
+                        const Text("0.7 Km, BTM"),
                         const SizedBox(width: 6),
                         const Text(
                           "Open",
                           style: TextStyle(color: Colors.green),
                         ),
-                      ],
-                      if (onlineAvailable) ...[
                         const SizedBox(width: 6),
                         const Text(
                           "Online available",
                           style: TextStyle(color: Color(0xFF7A32FF)),
                         ),
                       ],
-                    ],
-                  ),
-                ],
-              ),
-            ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 12),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: items
-                  .map((item) => _buildItemCard(context, item))
-                  .toList(),
+          // Show filtered products in grid
+          Expanded(
+            child: GridView.builder(
+              padding: const EdgeInsets.all(16),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2, // 2 items per row
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 0.7, // Adjust for your card height/width
+              ),
+              itemCount: filteredProducts.length,
+              itemBuilder: (context, index) {
+                return _buildItemCard(context, filteredProducts[index]);
+              },
             ),
           ),
         ],
@@ -211,12 +232,18 @@ class StoreListScreen extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => const ProductDetailScreen()),
+          MaterialPageRoute(
+            builder: (_) => ProductDetailScreen(
+              title: item['title'] ?? '',
+              price: item['price'] ?? '',
+              image: item['image'] ?? '',
+            ),
+          ),
         );
       },
       child: Container(
-        width: 160,
-        margin: const EdgeInsets.only(right: 12),
+        width: double.infinity,
+        margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -225,12 +252,15 @@ class StoreListScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Use product image from the list
             Container(
               height: 160,
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(16),
+                ),
                 image: DecorationImage(
-                  image: AssetImage('assets/shirt.png'),
+                  image: AssetImage(item["image"]!),
                   fit: BoxFit.cover,
                 ),
               ),

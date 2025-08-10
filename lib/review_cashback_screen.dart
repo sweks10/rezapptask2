@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 
 class ReviewCashbackScreen extends StatefulWidget {
-  const ReviewCashbackScreen({super.key});
+  final String image;
+  final String price; // <-- Add price
+
+  const ReviewCashbackScreen({
+    super.key,
+    required this.image,
+    required this.price, // <-- Add price
+  });
 
   @override
   State<ReviewCashbackScreen> createState() => _ReviewCashbackScreenState();
@@ -10,6 +17,13 @@ class ReviewCashbackScreen extends StatefulWidget {
 class _ReviewCashbackScreenState extends State<ReviewCashbackScreen> {
   final TextEditingController _reviewController = TextEditingController();
   bool _isSubmitting = false;
+
+  int calculateCoins(String price) {
+    final numeric = price.replaceAll(RegExp(r'[^\d]'), '');
+    if (numeric.isEmpty) return 0;
+    final value = int.tryParse(numeric) ?? 0;
+    return (value * 0.10).round();
+  }
 
   void _handleSubmit() async {
     if (_reviewController.text.trim().isEmpty) {
@@ -28,6 +42,7 @@ class _ReviewCashbackScreenState extends State<ReviewCashbackScreen> {
       _reviewController.clear();
     });
 
+    final coins = calculateCoins(widget.price);
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -63,11 +78,26 @@ class _ReviewCashbackScreenState extends State<ReviewCashbackScreen> {
                     ),
                   ),
                   SizedBox(height: 8),
-                  // Text(
-                  //   "Thanks for sharing your review. Your reward has been added to your wallet.",
-                  //   textAlign: TextAlign.center,
-                  // ),
+                  Text(
+                    "$coins coins added to wallet",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.green,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                   SizedBox(height: 24),
+                  // Add this button to close and return coins
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context); // Close bottom sheet
+                      Navigator.pop(
+                        context,
+                        coins,
+                      ); // Return coins to previous screen
+                    },
+                    child: Text("OK"),
+                  ),
                 ],
               ),
             ),
@@ -96,7 +126,7 @@ class _ReviewCashbackScreenState extends State<ReviewCashbackScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(child: Image.asset('assets/shirt.png', height: 200)),
+            Center(child: Image.asset(widget.image, height: 200)),
             SizedBox(height: 20),
             Text.rich(
               TextSpan(
